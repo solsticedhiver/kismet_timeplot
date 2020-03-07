@@ -14,7 +14,6 @@ import sys
 import os.path
 import os
 import re
-from scapy.layers import dot11
 
 VERSION = '0.1'
 NUMOFSECSINADAY = 60*60*24
@@ -56,11 +55,6 @@ def get_data(args):
     sql = 'select ts_sec,ts_usec,lower(sourcemac),lower(destmac),packet,signal from packets where phyname="IEEE802.11";'
     c.execute(sql)
     for row in c.fetchall():
-        if args.only_pr:
-            # keep only the probe request
-            packet = dot11.RadioTap(row[4]) # TODO: use something else than scapy to parse this because this is slow
-            if packet.type != 0 or packet.subtype != 4:
-                continue
         if row[5] < args.rssi:
             continue
         if row[2] in ts:
@@ -270,10 +264,9 @@ def main():
     parser.add_argument('-l', '--legend', action='store_true', default=False, help='add a legend')
     parser.add_argument('--label', action='store_true', default=False, help='add a mac label for each plot')
     parser.add_argument('-k', '--knownmac', action='append', help='known mac to highlight in red')
-    parser.add_argument('-M', '--min', type=int, default=3, help='minimum number of probe requests to consider')
+    parser.add_argument('-M', '--min', type=int, default=3, help='minimum number of packets for device to be plotted')
     parser.add_argument('-m', '--mac', action='append', help='only display that mac')
     parser.add_argument('-p', '--privacy', action='store_true', default=False, help='merge LAA MAC address')
-    parser.add_argument('--only-pr', default=False, action='store_true', help='when processing kismet db, keep only probe requests')
     parser.add_argument('-r', '--rssi', type=int, default=-99, help='minimal value for RSSI')
     parser.add_argument('-s', '--start', help='start timestamp')
     parser.add_argument('--span-time', default='1d', help='span of time (coud be #d or ##h or ###m)')

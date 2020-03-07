@@ -5,11 +5,11 @@ This python script uses *matplotlib* to draw a chart with the activity of each d
 
 It opens an interactive *matplotlib* window if no output image is specified.
 
-    usage: kismet_timeplot.py [-h] [-b DB] [-c] [-i [IMAGE]] [-l] [--label] [-k KNOWNMAC]
-                   [-M MIN] [-m MAC] [-p] [--only-pr] [-r RSSI] [-s START]
-                   [--span-time SPAN_TIME] [-t [TITLE]] [-v]
+    usage: kismet_timeplot.py [-h] [-b DB] [-i [IMAGE]] [-l] [--label]
+                              [-k KNOWNMAC] [-M MIN] [-m MAC] [-p] [-r RSSI]
+                              [-s START] [--span-time SPAN_TIME] [-t [TITLE]] [-v]
     
-    Plot MAC presence from probe requests in the database
+    Plot a timeline of devices' activity as captured by kismet
     
     optional arguments:
       -h, --help            show this help message and exit
@@ -20,10 +20,9 @@ It opens an interactive *matplotlib* window if no output image is specified.
       --label               add a mac label for each plot
       -k KNOWNMAC, --knownmac KNOWNMAC
                             known mac to highlight in red
-      -M MIN, --min MIN     minimum number of probe requests to consider
+      -M MIN, --min MIN     minimum number of packets for device to be plotted
       -m MAC, --mac MAC     only display that mac
       -p, --privacy         merge LAA MAC address
-      --only-pr             when processing kismet db, keep only probe requests
       -r RSSI, --rssi RSSI  minimal value for RSSI
       -s START, --start START
                             start timestamp
@@ -35,5 +34,3 @@ It opens an interactive *matplotlib* window if no output image is specified.
       -v, --verbose         be verbose
 
 ![Image of chart plotted with kismet_timeplot.py](plot.png)
-
-Note: using `--only-pr` is slow for now
