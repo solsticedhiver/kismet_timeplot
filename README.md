@@ -7,7 +7,7 @@ It opens an interactive *matplotlib* window if no output image is specified.
 
     usage: kismet_timeplot.py [-h] [-b DB] [-i [IMAGE]] [-l] [--label]
                               [-k KNOWNMAC] [-M MIN] [-m MAC] [-p] [-r RSSI]
-                              [-s START] [--span-time SPAN_TIME] [-t [TITLE]] [-v]
+                              [-s START] [--time-span TIME_SPAN] [-t [TITLE]] [-v]
     
     Plot a timeline of devices' activity as captured by kismet
     
@@ -26,11 +26,13 @@ It opens an interactive *matplotlib* window if no output image is specified.
       -r RSSI, --rssi RSSI  minimal value for RSSI
       -s START, --start START
                             start timestamp
-      --span-time SPAN_TIME
-                            span of time (coud be #d or ##h or ###m)
+      --time-span TIME_SPAN
+                            time span (coud be #d or ##h or ###m)
       -t [TITLE], --title [TITLE]
                             add a title to the top of image (if none specified,
                             use a timestamp)
       -v, --verbose         be verbose
 
 ![Image of chart plotted with kismet_timeplot.py](plot.png)
+
+By default, it plots the last **24 hours**. So if your capture is older than that, you need to specify a start time (with `-s` or `--start`) and possibly a time span (with `--time-span`)

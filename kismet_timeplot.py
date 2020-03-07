@@ -206,7 +206,7 @@ def plot_data(macs, times, args):
     elif args.span == 'h':
         # show minor tick every x minutes
         ax.xaxis.set_minor_formatter(ticker.FuncFormatter(showhourminute))
-        h = args.span_time//3600
+        h = args.time_span//3600
         sm = 10*60
         if h > 2:
             sm = 15*60
@@ -269,27 +269,27 @@ def main():
     parser.add_argument('-p', '--privacy', action='store_true', default=False, help='merge LAA MAC address')
     parser.add_argument('-r', '--rssi', type=int, default=-99, help='minimal value for RSSI')
     parser.add_argument('-s', '--start', help='start timestamp')
-    parser.add_argument('--span-time', default='1d', help='span of time (coud be #d or ##h or ###m)')
+    parser.add_argument('--time-span', default='1d', help='time span (coud be #d or ##h or ###m)')
     parser.add_argument('-t', '--title', nargs='?', const='', default=None, help='add a title to the top of image (if none specified, use a timestamp)')
     parser.add_argument('-v', '--verbose', action='store_true', default=False, help='be verbose')
     # RESERVED: args.span, args.start_time, args.end_time
     args = parser.parse_args()
 
-    # parse span_time
-    args.span = args.span_time[-1:]
+    # parse time_span
+    args.span = args.time_span[-1:]
     try:
-        sp = int(args.span_time[:-1])
+        sp = int(args.time_span[:-1])
     except ValueError:
-        print('Error: --span-time argument should be of the form [digit]...[d|h|m]')
+        print('Error: --time-span argument should be of the form [digit]...[d|h|m]')
         sys.exit(-1)
     if args.span == 'd':
-        args.span_time = sp*NUMOFSECSINADAY
+        args.time_span = sp*NUMOFSECSINADAY
     elif args.span == 'h':
-        args.span_time = sp*60*60
+        args.time_span = sp*60*60
     elif args.span == 'm':
-        args.span_time = sp*60
+        args.time_span = sp*60
     else:
-        print('Error: --span-time postfix could only be d or h or m')
+        print('Error: --times-span postfix could only be d or h or m')
         sys.exit(-1)
 
     if args.knownmac is None:
@@ -310,10 +310,10 @@ def main():
             except ValueError:
                 print(f"Error: can't parse date timestamp, excepted format YYYY-mm-dd[THH:MM]", file=sys.stderr)
                 sys.exit(-1)
-        end_time = start_time + args.span_time
+        end_time = start_time + args.time_span
     else:
         end_time = time.time()
-        start_time = end_time - args.span_time
+        start_time = end_time - args.time_span
     args.start_time = start_time
     args.end_time = end_time
 
