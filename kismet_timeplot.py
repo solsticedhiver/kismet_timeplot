@@ -100,7 +100,7 @@ def get_data(args):
 
     # filter our data set based on min probe request or mac appearence
     for k,v in list(ts.items()):
-        if (len(v) <= args.min and k not in args.knownmac) or k not in macs:
+        if (len(v) <= args.min and k not in args.knownmac) or k not in macs or k in config.IGNORED:
             del ts[k]
 
     # sort the data on frequency of appearence
