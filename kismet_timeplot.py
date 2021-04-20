@@ -61,26 +61,23 @@ def get_data(args):
             ts[row[2]].append(row[0])
         else:
             ts[row[2]] = [row[0]]
-        # filter out multicast mac addresses. TODO: use the exact range 00:00:00-7f:ff:ff
-        if row[3] in ts and not row[3].startswith('01:00:5e'):
+        if row[3] in ts:
             ts[row[3]].append(row[0])
         else:
             ts[row[3]] = [row[0]]
-    try:
-        del ts['ff:ff:ff:ff:ff:ff']
-        del ts['00:00:00:00:00:00']
-    except KeyError as k:
-        pass
+
     # filter to keep only wifi client and device
     sql = 'select lower(devmac),type from devices'
     c.execute(sql)
+    dev_type = {}
     for row in c.fetchall():
-        if row[1] not in ['Wi-Fi Device','Wi-Fi Client']:
-            try:
-                del ts[row[0]]
-            except KeyError as k:
-                pass
+        dev_type[row[0]] = row[1]
     conn.close()
+
+    for k in list(ts.keys()):
+        # remove Wi-Fi AP and Wi-Fi-Bridged
+        if k not in dev_type or dev_type[k] not in ('Wi-Fi Device','Wi-Fi Client', 'Wi-Fi Ad-Hoc'):
+            del ts[k]
 
     def match(m, s):
         # match on start of mac address and use % as wild-card like in SQL syntax
@@ -91,8 +88,6 @@ def get_data(args):
         m = '^'+m
         return re.search(m, s) is not None
 
-    if None in ts.keys():
-        del ts[None]
     macs = list(ts.keys())
     if args.mac :
         # keep mac with args.mac as substring
