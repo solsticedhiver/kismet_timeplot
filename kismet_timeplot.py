@@ -22,7 +22,6 @@ COLORS = ['tab:blue', 'tab:orange', 'tab:green', 'tab:purple', 'tab:brown', 'tab
 
 # read config variable from config.py file
 import config
-config.MERGED = (m[:8] for m in config.MERGED)
 
 # draws a rectangle as custom legend handler
 class MyLine2DHandler(object):
@@ -118,7 +117,7 @@ def get_data(args):
             times.append(sorted(t))
 
     # merge all same vendor mac into one plot for a virtual MAC called 'OUI'
-    for mv in config.MERGED:
+    for mv in args.merged:
         indx = [i for i,m in enumerate(macs) if m[:8] == mv]
         if len(indx) > 0:
             t = []
@@ -258,6 +257,7 @@ def main():
     parser.add_argument('-i', '--image', default=None, const='plot.png', nargs='?', help='output an image')
     parser.add_argument('-l', '--legend', action='store_true', default=False, help='add a legend')
     parser.add_argument('--label', action='store_true', default=False, help='add a mac label for each plot')
+    parser.add_argument('-g', '--merged', action='append', help='OUI mac to merge')
     parser.add_argument('-k', '--knownmac', action='append', help='known mac to highlight in red')
     parser.add_argument('-M', '--min', type=int, default=3, help='minimum number of packets for device to be plotted')
     parser.add_argument('-m', '--mac', action='append', help='only display that mac')
@@ -289,6 +289,10 @@ def main():
 
     if args.knownmac is None:
         args.knownmac = config.KNOWNMAC
+
+    if args.merged is None:
+        args.merged = config.MERGED
+    args.merged = (m[:8] for m in args.merged)
 
     if not args.db or not os.path.exists(args.db):
         print(f'Error: file not found {args.db}', file=sys.stderr)
