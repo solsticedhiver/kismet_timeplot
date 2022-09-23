@@ -43,6 +43,15 @@ def get_data(args):
     # sqlite3
     conn = sqlite3.connect(f'file:{args.db}?mode=ro', uri=True)
     c = conn.cursor()
+    sql = 'pragma quick_check;'
+    c.execute(sql)
+    try:
+        res = c.fetchone()[0]
+    except sqlite3.DatabaseError:
+        print(f'Error: {args.db} db failed integrity check')
+        sys.exit(1)
+    assert(res == 'ok')
+
     sql = 'pragma query_only = on;'
     c.execute(sql)
     sql = 'pragma temp_store = 2;' # to store temp table and indices in memory
