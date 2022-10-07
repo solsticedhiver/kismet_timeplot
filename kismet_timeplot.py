@@ -47,10 +47,11 @@ def get_data(args):
     c.execute(sql)
     try:
         res = c.fetchone()[0]
+        if res != 'ok':
+            raise sqlite3.DatabaseError()
     except sqlite3.DatabaseError:
         print(f'Error: {args.db} db failed integrity check')
         sys.exit(1)
-    assert(res == 'ok')
 
     sql = 'pragma query_only = on;'
     c.execute(sql)
@@ -324,12 +325,11 @@ def main():
     args.start_time = start_time
     args.end_time = end_time
 
-    fig = None
     if args.verbose:
         print(':: Gathering data')
     macs, times = get_data(args)
     if len(times) == 0 or len(macs) == 0:
-        print(f'Error: nothing to plot', file=sys.stderr)
+        print('Error: nothing to plot', file=sys.stderr)
         sys.exit(-1)
 
     if args.verbose:
