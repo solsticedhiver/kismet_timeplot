@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from datetime import datetime
+import datetime
 import time
 from cycler import cycler
 import matplotlib
@@ -209,7 +209,7 @@ def plot_data(macs, times, args):
     elif args.span == 'h':
         # show minor tick every x minutes
         ax.xaxis.set_minor_formatter(ticker.FuncFormatter(showhourminute))
-        h = args.time_span//3600
+        h = args.time_span / datetime.timedelta(hours=1)
         sm = 10*60
         if h > 2:
             sm = 15*60
@@ -240,8 +240,8 @@ def plot_data(macs, times, args):
         ax.legend(lines, macs, loc='lower left', ncol=len(macs)//30+1,
             handler_map={matplotlib.lines.Line2D: MyLine2DHandler()}, prop={'family':'monospace', 'size':8})
     # avoid too much space around our data by defining set
-    space = 5*60 # 5 minutes
-    ax.set_xlim(args.start_time-space, args.end_time+space)
+    space = datetime.timedelta(minutes=5) # 5 minutes
+    ax.set_xlim((args.start_time-space).timestamp(), (args.end_time+space).timestamp())
     ax.set_ylim(-1, len(macs))
     # add a title to the image
     if args.title is not None:
@@ -287,11 +287,11 @@ def main():
         print('Error: --time-span argument should be of the form [digit]...[d|h|m]')
         sys.exit(-1)
     if args.span == 'd':
-        args.time_span = sp*NUMOFSECSINADAY
+        args.time_span = datetime.timedelta(days=sp)
     elif args.span == 'h':
-        args.time_span = sp*60*60
+        args.time_span = datetime.timedelta(hours=sp)
     elif args.span == 'm':
-        args.time_span = sp*60
+        args.time_span = datetime.timedelta(minutes=sp)
     else:
         print('Error: --times-span postfix could only be d or h or m')
         sys.exit(-1)
@@ -309,18 +309,17 @@ def main():
 
     if args.start:
         try:
-            start_time = time.mktime(time.strptime(args.start, '%Y-%m-%dT%H:%M'))
+            start_time = datetime.datetime.strptime(args.start, '%Y-%m-%dT%H:%M')
         except  ValueError:
             try:
-                date = time.strptime(args.start, '%Y-%m-%d')
-                date = time.strptime('%sT12:00' % args.start, '%Y-%m-%dT%H:%M')
-                start_time = time.mktime(date)
+                start_time = datetime.datetime.strptime(args.start, '%Y-%m-%d')
+                start_time = datetime.datetime.strptime(f'{args.start}T12:00', '%Y-%m-%dT%H:%M')
             except ValueError:
-                print(f"Error: can't parse date timestamp, excepted format YYYY-mm-dd[THH:MM]", file=sys.stderr)
+                print("Error: can't parse date timestamp, excepted format YYYY-mm-dd[THH:MM]", file=sys.stderr)
                 sys.exit(-1)
         end_time = start_time + args.time_span
     else:
-        end_time = time.time()
+        end_time = datetime.datetime.now()
         start_time = end_time - args.time_span
     args.start_time = start_time
     args.end_time = end_time
