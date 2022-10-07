@@ -274,28 +274,40 @@ def main():
     parser.add_argument('-p', '--privacy', action='store_true', default=False, help='merge LAA MAC address')
     parser.add_argument('-r', '--rssi', type=int, default=-99, help='minimal value for RSSI')
     parser.add_argument('-s', '--start', help='start timestamp')
-    parser.add_argument('--time-span', default='1d', help='time span (coud be #d or ##h or ###m)')
+    parser.add_argument('--time-span', default='1d', help='time span (expected format [###d][###h][###m]')
     parser.add_argument('-t', '--title', nargs='?', const='', default=None, help='add a title to the top of image (if none specified, use a timestamp)')
     parser.add_argument('-v', '--verbose', action='store_true', default=False, help='be verbose')
     # RESERVED: args.span, args.start_time, args.end_time
     args = parser.parse_args()
 
     # parse time_span
-    args.span = args.time_span[-1:]
-    try:
-        sp = int(args.time_span[:-1])
-    except ValueError:
-        print('Error: --time-span argument should be of the form [digit]...[d|h|m]')
-        sys.exit(-1)
-    if args.span == 'd':
-        args.time_span = datetime.timedelta(days=sp)
-    elif args.span == 'h':
-        args.time_span = datetime.timedelta(hours=sp)
-    elif args.span == 'm':
-        args.time_span = datetime.timedelta(minutes=sp)
-    else:
-        print('Error: --times-span postfix could only be d or h or m')
-        sys.exit(-1)
+    tmsp = args.time_span
+    args.time_span = datetime.timedelta(hours=0)
+    number = ''
+    for c in tmsp:
+        if c in '0123456789':
+            number += c
+        else:
+            try:
+                if c == 'd':
+                    args.time_span += datetime.timedelta(days=int(number))
+                    args.span = 'd'
+                    number = ''
+                elif c == 'h':
+                    args.time_span += datetime.timedelta(hours=int(number))
+                    args.span = 'h'
+                    number = ''
+                elif c == 'm':
+                    args.time_span += datetime.timedelta(minutes=int(number))
+                    args.span = 'm'
+                    number = ''
+                else:
+                    print('Error: --times-span postfix number could only be d or h or m')
+                    sys.exit(-1)
+            except ValueError:
+                print('Error: --time-span argument should be of the form [:number:][d|h|m]')
+                sys.exit(-1)
+
 
     if args.knownmac is None:
         args.knownmac = config.KNOWNMAC
