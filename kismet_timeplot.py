@@ -64,6 +64,10 @@ def get_data(args):
     sql = 'select ts_sec,ts_usec,lower(sourcemac),lower(destmac),packet,signal from packets where phyname="IEEE802.11";'
     c.execute(sql)
     for row in c.fetchall():
+        ts_sec = datetime.datetime.fromtimestamp(row[0])
+        ts_sec = ts_sec.replace(microsecond=row[1])
+        if ts_sec > args.end_time or ts_sec < args.start_time:
+            continue
         if row[5] < args.rssi:
             continue
         if row[2] in ts:
@@ -100,7 +104,7 @@ def get_data(args):
     macs = list(ts.keys())
     if args.mac :
         # keep mac with args.mac as substring
-        macs = [m for m in list(ts.keys()) if any(match(am.lower(), m) for am in args.mac)]
+        macs = [m for m in macs if any(match(am.lower(), m) for am in args.mac)]
 
     # filter our data set based on min probe request or mac appearence
     for k,v in list(ts.items()):
