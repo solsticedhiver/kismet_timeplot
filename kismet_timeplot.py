@@ -61,6 +61,18 @@ def get_data(args):
     c.execute(sql)
     conn.commit()
 
+    # use last packet ts_sec
+    #sql = 'select ts_sec from packets where phyname="IEEE802.11" order by ts_sec asc limit 1;'
+    #c.execute(sql)
+    #ts_sec_first = datetime.datetime.fromtimestamp(c.fetchone()[0])
+    sql = 'select ts_sec from packets where phyname="IEEE802.11" order by ts_sec desc limit 1;'
+    c.execute(sql)
+    ts_sec_last = datetime.datetime.fromtimestamp(c.fetchone()[0])
+    if args.end_time > ts_sec_last:
+        args.end_time = ts_sec_last
+        if not args.start:
+            args.start_time = args.end_time - args.time_span
+
     sql = 'select ts_sec,ts_usec,lower(sourcemac),lower(destmac),packet,signal from packets where phyname="IEEE802.11";'
     c.execute(sql)
     for row in c.fetchall():
