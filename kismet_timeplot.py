@@ -219,11 +219,19 @@ def plot_data(macs, times, args):
     ax.xaxis.set_remove_overlapping_locs(False)
     # customize label of major/minor ticks
     ax.xaxis.set_major_formatter(ticker.FuncFormatter(showdate))
-    if args.span == 'd':
+    if args.time_span > datetime.timedelta(days=4):
+        # show minor tick every 6 hours
+        ax.xaxis.set_minor_formatter(ticker.FuncFormatter(showhour))
+        ax.xaxis.set_minor_locator(ticker.MultipleLocator(6*60*60))
+    elif args.time_span > datetime.timedelta(days=2):
+        # show minor tick every 6 hours
+        ax.xaxis.set_minor_formatter(ticker.FuncFormatter(showhour))
+        ax.xaxis.set_minor_locator(ticker.MultipleLocator(3*60*60))
+    elif args.time_span > datetime.timedelta(days=1):
         # show minor tick every hour
         ax.xaxis.set_minor_formatter(ticker.FuncFormatter(showhour))
         ax.xaxis.set_minor_locator(ticker.MultipleLocator(60*60))
-    elif args.span == 'h':
+    elif args.time_span <= datetime.timedelta(days=1):
         # show minor tick every x minutes
         ax.xaxis.set_minor_formatter(ticker.FuncFormatter(showhourminute))
         h = args.time_span / datetime.timedelta(hours=1)
@@ -235,7 +243,7 @@ def plot_data(macs, times, args):
         if h > 12:
             sm = 60*60
         ax.xaxis.set_minor_locator(ticker.MultipleLocator(sm))
-    elif args.span == 'm':
+    elif args.time_span < datetime.timedelta(hours=6):
         # show minor tick every 5 minutes
         ax.xaxis.set_minor_formatter(ticker.FuncFormatter(showhourminute))
         ax.xaxis.set_minor_locator(ticker.MultipleLocator(5*60))
@@ -323,7 +331,6 @@ def main():
             except ValueError:
                 print('Error: --time-span argument should be of the form [:number:][d|h|m]')
                 sys.exit(-1)
-
 
     if args.knownmac is None:
         args.knownmac = config.KNOWNMAC
