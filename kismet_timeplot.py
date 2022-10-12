@@ -67,7 +67,11 @@ def get_data(args):
     #ts_sec_first = datetime.datetime.fromtimestamp(c.fetchone()[0])
     sql = 'select ts_sec from packets where phyname="IEEE802.11" order by ts_sec desc limit 1;'
     c.execute(sql)
-    ts_sec_last = datetime.datetime.fromtimestamp(c.fetchone()[0])
+    res = c.fetchone()
+    if not res:
+        print('Error: no packet found', file=sys.stderr)
+        sys.exit(1)
+    ts_sec_last = datetime.datetime.fromtimestamp(res[0])
     if args.end_time > ts_sec_last:
         args.end_time = ts_sec_last
         if not args.start:
