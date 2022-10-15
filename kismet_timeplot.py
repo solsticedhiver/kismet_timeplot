@@ -148,7 +148,7 @@ def get_data(args):
 
     # merge all LAA mac into one plot for a virtual MAC called 'LAA'
     if args.privacy:
-        indx = [i for i,m in enumerate(macs) if m[:8] not in args.merged and is_local_bit_set(m)]
+        indx = [i for i,m in enumerate(macs) if m[:8] not in args.merged and is_local_bit_set(m) and m not in args.knownmac]
         if len(indx) > 0:
             t = []
             # merge all times for LAA macs
