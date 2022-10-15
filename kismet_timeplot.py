@@ -133,19 +133,6 @@ def get_data(args):
     macs = [x for x,_ in data]
     times = [x for _,x in data]
 
-    # merge all LAA mac into one plot for a virtual MAC called 'LAA'
-    if args.privacy:
-        indx = [i for i,m in enumerate(macs) if is_local_bit_set(m)]
-        if len(indx) > 0:
-            t = []
-            # merge all times for LAA macs
-            for i in indx:
-                t.extend(times[i])
-            macs = [m for i,m in enumerate(macs) if i not in indx]
-            times = [x for i,x in enumerate(times) if i not in indx]
-            macs.append('LAA')
-            times.append(sorted(t))
-
     # merge all same vendor mac into one plot for a virtual MAC called 'OUI'
     for mv in args.merged:
         indx = [i for i,m in enumerate(macs) if m[:8] == mv]
@@ -157,6 +144,19 @@ def get_data(args):
             macs = [m for i,m in enumerate(macs) if i not in indx]
             times = [x for i,x in enumerate(times) if i not in indx]
             macs.append(mv)
+            times.append(sorted(t))
+
+    # merge all LAA mac into one plot for a virtual MAC called 'LAA'
+    if args.privacy:
+        indx = [i for i,m in enumerate(macs) if m[:8] not in args.merged and is_local_bit_set(m)]
+        if len(indx) > 0:
+            t = []
+            # merge all times for LAA macs
+            for i in indx:
+                t.extend(times[i])
+            macs = [m for i,m in enumerate(macs) if i not in indx]
+            times = [x for i,x in enumerate(times) if i not in indx]
+            macs.append('LAA')
             times.append(sorted(t))
 
     return (macs, times)
@@ -341,7 +341,7 @@ def main():
 
     if args.merged is None:
         args.merged = config.MERGED
-    args.merged = (m[:8] for m in args.merged)
+    args.merged = list(m[:8] for m in args.merged)
 
     if not args.db or not os.path.exists(args.db):
         print(f'Error: file not found {args.db}', file=sys.stderr)
