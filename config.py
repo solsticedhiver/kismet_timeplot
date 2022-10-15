@@ -3,7 +3,7 @@
 KNOWNMAC = ('xx:xx:xx:xx:xx:xx')
 MYDEVICES = ('xx:xx:xx:xx:xx:xx',
 )
-MERGED = ('yy:yy:yy:*',)
+MERGED = ('da:a1:19:*',) # well known android LAA addresses
 IGNORED = MYDEVICES
 
 HEIGHT = 1366 # in pixels
