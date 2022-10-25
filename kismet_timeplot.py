@@ -103,9 +103,14 @@ def get_data(args):
         dev_type[row[0]] = row[1]
     conn.close()
 
-    keepthem = ('Wi-Fi Device','Wi-Fi Client', 'Wi-Fi Ad-Hoc')
+    if args.no_devices:
+        keepthem = tuple()
+    else:
+        keepthem = ('Wi-Fi Device','Wi-Fi Client', 'Wi-Fi Ad-Hoc')
     if args.ap:
-        keepthem = ('Wi-Fi AP')
+        keepthem += ('Wi-Fi AP',)
+    if args.bridged:
+        keepthem += ('Wi-Fi Bridged',)
     for k in list(ts.keys()):
         # remove Wi-Fi AP and Wi-Fi-Bridged
         if k not in dev_type or dev_type[k] not in keepthem:
@@ -294,7 +299,9 @@ def plot_data(macs, times, args):
 
 def main():
     parser = argparse.ArgumentParser(description="Plot a timeline of devices' activity as captured by kismet")
-    parser.add_argument('--ap', action='store_true', default=False, help='show APs only')
+    parser.add_argument('--ap', action='store_true', default=False, help='show APs')
+    parser.add_argument('--bridged', action='store_true', default=False, help='show bridged wifi devices')
+    parser.add_argument('--no-devices', action='store_true', default=False, help='do not show wifi devices/clients')
     parser.add_argument('-b', '--db', help='file name of the kismet db')
     parser.add_argument('-i', '--image', default=None, const='plot.png', nargs='?', help='output an image')
     parser.add_argument('-l', '--legend', action='store_true', default=False, help='add a legend')
