@@ -44,8 +44,8 @@ def get_data(args):
     conn = sqlite3.connect(f'file:{args.db}?mode=ro', uri=True)
     c = conn.cursor()
     sql = 'pragma quick_check;'
-    c.execute(sql)
     try:
+        c.execute(sql)
         res = c.fetchone()[0]
         if res != 'ok':
             raise sqlite3.DatabaseError()
