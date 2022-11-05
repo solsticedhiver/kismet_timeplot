@@ -77,14 +77,14 @@ def get_data(args):
         if not args.start:
             args.start_time = args.end_time - args.time_span
 
-    sql = 'select ts_sec,ts_usec,lower(sourcemac),lower(destmac),packet,signal from packets where phyname="IEEE802.11";'
+    sql = 'select ts_sec,ts_usec,lower(sourcemac),lower(destmac),signal from packets where phyname="IEEE802.11";'
     c.execute(sql)
     for row in c.fetchall():
         ts_sec = datetime.datetime.fromtimestamp(row[0])
         ts_sec = ts_sec.replace(microsecond=row[1])
         if ts_sec > args.end_time or ts_sec < args.start_time:
             continue
-        if row[5] < args.rssi:
+        if row[4] < args.rssi:
             continue
         if row[2] in ts:
             ts[row[2]].append(row[0])
