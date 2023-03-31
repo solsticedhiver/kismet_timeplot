@@ -77,9 +77,11 @@ def get_data(args):
         if not args.start:
             args.start_time = args.end_time - args.time_span
 
-    sql = 'select ts_sec,ts_usec,lower(sourcemac),lower(destmac),signal from packets where phyname="IEEE802.11";'
+    sql = 'select ts_sec,ts_usec,lower(sourcemac),lower(destmac),signal,datasource from packets where phyname="IEEE802.11";'
     c.execute(sql)
     for row in c.fetchall():
+        if args.src and row[5] not in args.src:
+            continue
         ts_sec = datetime.datetime.fromtimestamp(row[0])
         ts_sec = ts_sec.replace(microsecond=row[1])
         if ts_sec > args.end_time or ts_sec < args.start_time:
@@ -313,6 +315,7 @@ def main():
     parser.add_argument('-p', '--privacy', action='store_true', default=False, help='merge LAA MAC address')
     parser.add_argument('-r', '--rssi', type=int, default=-99, help='minimal value for RSSI')
     parser.add_argument('-s', '--start', help='start timestamp')
+    parser.add_argument('--src', action='append', help='only use that source (by UUID)')
     parser.add_argument('--time-span', default='1d', help='time span (expected format [###d][###h][###m]')
     parser.add_argument('-t', '--title', nargs='?', const='', default=None, help='add a title to the top of image (if none specified, use a timestamp)')
     parser.add_argument('-v', '--verbose', action='store_true', default=False, help='be verbose')
